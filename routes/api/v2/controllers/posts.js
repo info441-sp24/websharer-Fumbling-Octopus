@@ -6,12 +6,12 @@ import getURLPreview from '../utils/urlPreviews.js';
 
 //TODO: Add handlers here
 router.post('/', async (req, res) => {
-    let postObject = req.body
     try{
         let comingPost = new req.models.Post({
-            url: postObject.url,
-            description: postObject.description,
-            current: postObject.date
+            url: req.body.url,
+            description: req.body.description,
+            current_time: Date.now(),
+            username: req.body.username
         })
         await comingPost.save()
         res.json({"status": "success"})
@@ -21,26 +21,42 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.get('/', async function(req, res, next) {
-    try{
-      let allPosts = await req.models.Post.find()
-      const postData = await Promise.all (allPost.map(async post => {
-        let htmlPreview{}
-        try{
-          htmlPreview = await getURLPreview(post.url)
-        } catch{
-          htmlPreview = error.message
-          res.send('error')
-      
+// router.get('/', async function(req, res) {
+//     try{
+//       let allPosts = await req.models.Post.find()
+//       const postData = await Promise.all (allPosts.map(async post => {
+//         try{
+//           htmlPreview = await getURLPreview(post.url)
+//         } catch{
+//           htmlPreview = error.message
+//           res.send('error')
+//         }
+//         return { description: post.description, htmlPreview: `Error: ${error.message}` };
+//       }));
+//       res.json(postData)
+//     } catch(error) {
+//       console.log("Error:", error)
+//       res.status(500).json({"status": "error", "error": error})
+//     }
+//   });
 
-        }
-        return { description: post.description, htmlPreview: `Error: ${error.message}` };
+router.get('/', async (req, res) => {
+  try {
+      const posts = await req.models.Post.find(); 
+      const postData = await Promise.all(posts.map(async post => {
+          try {
+              const htmlPreview = await getURLPreview(post.url);
+              return { description: post.description, htmlPreview };
+          } catch (error) {
+              return { description: post.description, htmlPreview: `Error: ${error.message}` };
+          }
       }));
-      res.json(postData)
-    } catch(error){
-      console.log("Error:", error)
-      res.status(500).json({"status": "error", "error": error})
-    }
-  });
+      res.json(postData);
+  } catch (error) {
+      console.error(error);
+      console.log('here is the problem 2')
+      res.status(500).json({ status: "error", error: error.message }); // Send a 500 status on error
+  }
+});
 
 export default router;
