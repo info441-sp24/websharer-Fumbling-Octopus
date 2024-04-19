@@ -23,14 +23,24 @@ router.post('/', async (req, res) => {
 
 router.get('/', async function(req, res, next) {
     try{
-      let allPosts = await req.models.User.find()
-      res.json(allUsers)
+      let allPosts = await req.models.Post.find()
+      const postData = await Promise.all (allPost.map(async post => {
+        let htmlPreview{}
+        try{
+          htmlPreview = await getURLPreview(post.url)
+        } catch{
+          htmlPreview = error.message
+          res.send('error')
+      
+
+        }
+        return { description: post.description, htmlPreview: `Error: ${error.message}` };
+      }));
+      res.json(postData)
     } catch(error){
       console.log("Error:", error)
       res.status(500).json({"status": "error", "error": error})
     }
   });
-  
-
 
 export default router;
