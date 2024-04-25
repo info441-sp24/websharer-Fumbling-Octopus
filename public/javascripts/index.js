@@ -11,7 +11,7 @@ async function loadPosts(){
     let postsJson = await fetchJSON(`api/${apiVersion}/posts`)
     
     let postsHtml = postsJson.map(postInfo => {
-        return `<div class="post">${postInfo.username }${postInfo.description }${postInfo.htmlPreview }</div>`
+        return `<div class="post">${postInfo.username}${postInfo.description}${postInfo.htmlPreview}</div>`
     }).join("\n");
     document.getElementById("posts_box").innerHTML = postsHtml;
 }
