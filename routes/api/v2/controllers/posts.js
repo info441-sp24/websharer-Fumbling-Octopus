@@ -13,7 +13,15 @@ router.post('/', async (req, res) => {
             current_time: Date.now(),
             username: req.body.username
         })
-        await comingPost.save()
+        const escapeHTML = comingPost => comingPost.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+                }[tag]));
+        await escapeHTML.save()
         res.json({"status": "success"})
     } catch (error){
         console.log("Error:", error)
