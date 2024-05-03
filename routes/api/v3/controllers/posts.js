@@ -4,26 +4,28 @@ var router = express.Router();
 
 import getURLPreview from '../utils/urlPreviews.js';
 
+const escapeHTML = str => String(str).replace(/[&<>'"]/g, 
+    tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[tag]));
+
 //TODO: Add handlers here
 router.post('/', async (req, res) => {
     if (req.session.isAuthenticated) {
+        let reqBody = req.body
         try{
             let comingPost = new req.models.Post({
-                url: req.body.url,
-                description: req.body.description,
-                current_time: Date.now(),
-                username: req.body.username
+                url: reqBody.url,
+                username: req.session.account.username,
+                description: reqBody.description,
             })
-            const escapeHTML = comingPost => comingPost.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                    }[tag]));
-            await escapeHTML.save()
-            res.json({"status": "success"})
+            
+            await escapeHTML(comingPost).save()
+            res.json({"status": "success"});
         } catch (error){
             console.log("Error:", error)
             res.status(500).json({"status": "error", "error": error})
@@ -55,7 +57,7 @@ router.post('/', async (req, res) => {
 //   });
 
 router.get('/', async (req, res) => {
-    let userbane = req.query.username
+    let username = req.query.username
   try {
     let posts = []
     if (username) {
@@ -63,7 +65,6 @@ router.get('/', async (req, res) => {
     } else {
         posts = await req.models.Post.find();
     }
-      const posts = await req.models.Post.find(); 
       const postData = await Promise.all(posts.map(async post => {
           try {
               const htmlPreview = await getURLPreview(post.url);
