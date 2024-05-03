@@ -31,7 +31,7 @@ const authConfig = {
 
 	system: {
     	loggerOptions: {
-        	loggerCallback(message) {
+        	loggerCallback(loglevel, message, containsPii) {
             	console.log(message);
         	},
         	piiLoggingEnabled: false,
@@ -50,7 +50,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use((req, next) => {
+app.use((req, res, next) => {
     req.models = postModel;
     next();
 });
@@ -84,7 +84,7 @@ app.get( '/signout', (req, res, next) => {
 app.use(authProvider.interactionErrorHandler());
 app.use('/api/v3', apiV3Router);
 app.use('/api/v2', apiV2Router);
-app.use('/api/v1', apiV1Router);
+app.use('/api', apiV1Router);
 
 // use this by going to urls like: 
 // http://localhost:3000/fakelogin?name=anotheruser
@@ -98,7 +98,7 @@ app.get('/fakelogin', (req, res) => {
     session.account.name = newName;
     session.account.username = newName;
     console.log("set session");
-    res.redirect("/api/v3/users/myIdentity");
+    res.redirect("/api/v3/myIdentity");
 });
 
 // use this by going to a url like: 
@@ -109,7 +109,8 @@ app.get('/fakelogout', (req, res) => {
     session.isAuthenticated = false;
     session.account = {};
     console.log("you have fake logged out");
-    res.redirect("/api/v3/users/myIdentity");
+    res.redirect("/api/v3/myIdentity");
 });
 
 export default app;
+

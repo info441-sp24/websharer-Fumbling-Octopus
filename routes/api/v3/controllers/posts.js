@@ -4,17 +4,17 @@ var router = express.Router();
 
 import getURLPreview from '../utils/urlPreviews.js';
 
-const escapeHTML = str => String(str).replace(/[&<>'"]/g, 
-    tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-    }[tag]));
+// const escapeHTML = str => String(str).replace(/[&<>'"]/g, 
+//     tag => ({
+//         '&': '&amp;',
+//         '<': '&lt;',
+//         '>': '&gt;',
+//         "'": '&#39;',
+//         '"': '&quot;'
+//     }[tag]));
 
 //TODO: Add handlers here
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
     if (req.session.isAuthenticated) {
         let reqBody = req.body
         try{
@@ -22,9 +22,12 @@ router.post('/', async (req, res) => {
                 url: reqBody.url,
                 username: req.session.account.username,
                 description: reqBody.description,
+                created_date: Date.now()
             })
             
-            await escapeHTML(comingPost).save()
+            // await escapeHTML(comingPost).save()
+            await comingPost.save()
+
             res.json({"status": "success"});
         } catch (error){
             console.log("Error:", error)
@@ -38,7 +41,7 @@ router.post('/', async (req, res) => {
 })
 
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     let username = req.query.username
   try {
     let posts = []
@@ -47,17 +50,17 @@ router.get('/', async (req, res) => {
     } else {
         posts = await req.models.Post.find();
     }
-      const postData = await Promise.all(posts.map(async post => {
-        let htmlPreview = {}
-          try {
+    const postData = await Promise.all (posts.map(async post => {
+    let htmlPreview = {}
+        try {
             htmlPreview = await getURLPreview(post.url);
-          } catch (error) {
-            htmlPreview = err.message
+        } catch (error) {
+            htmlPreview = error.message
         }
-          return { "description": post.description, "username" : post.username, "htmlPreview" : htmlPreview };
+        return { "description": post.description, "username" : post.username, "htmlPreview" : htmlPreview };
 
-      }));
-      res.json(postData);
+    }));
+    res.json(postData);
   } catch (error) {
       console.error(error);
       console.log('here is the problem 2')

@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-
 import parser from 'node-html-parser';
 
 const escapeHTML = str => String(str).replace(/[&<>'"]/g, 
@@ -15,16 +14,13 @@ async function getURLPreview(url){
   // TODO: Copy from your code for making url previews in A2 to make this 
   // a function that takes a url and returns an html string with a preview of that html
   try {
-    const queryString = req.query.url
-    const fetchQuery = await fetch(queryString)
+    const fetchQuery = await fetch(url)
 
   if(!fetchQuery.ok) {
     throw new Error('failure on fetching URL')
   }
 
     const pageText = await fetchQuery.text()
-
-
     //parse html
     const htmlPageContent = parser.parse(pageText)
 
@@ -33,8 +29,8 @@ async function getURLPreview(url){
     const findTitle = htmlPageContent.querySelector("meta[property='og:title']")
     const findDescription = htmlPageContent.querySelector("meta[property='og:description']")
 
-    let url = findUrl ? findUrl.getAttribute('content') : queryString;
-    let title = findTitle ? escapeHTML(findTitle.getAttribute('content')) : (htmlPageContent.querySelector('title') ? escapeHTML(htmlPageContent.querySelector('title').innerHTML) : queryString);
+    let url = findUrl ? findUrl.getAttribute('content') : url;
+    let title = findTitle ? escapeHTML(findTitle.getAttribute('content')) : (htmlPageContent.querySelector('title') ? escapeHTML(htmlPageContent.querySelector('title').innerHTML) : url);
     let image = findImage ? escapeHTML(findImage.getAttribute('content')) : '';
     let description = findDescription ? escapeHTML(findDescription.getAttribute('content')) : '';
 
@@ -49,11 +45,9 @@ async function getURLPreview(url){
         <p>${description}</p>
       </div>`;
 
-    res.setHeader('Content-Type', 'text/html');
-    res.send(htmlDisplay);
-
-  } catch (err) {
-    console.log(err)
+    return htmlDisplay
+  } catch (error) {
+    console.log(error)
     res.status(500).send("Error: html content")
   }
 }
