@@ -5,12 +5,11 @@ router.get("/myIdentity", async (req, res) => {
     try {
         if (req.session.isAuthenticated) {
             res.json({
-                
-                    status: "loggedin", 
-                    userInfo: {
-                       name: req.session.account.name, 
-                       username: req.session.account.username}
-                 
+                status: "loggedin", 
+                userInfo: {
+                    name: req.session.account.name, 
+                    username: req.session.account.username
+                }
             })
         } else {
             res.json({

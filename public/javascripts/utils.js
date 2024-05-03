@@ -27,8 +27,9 @@ async function fetchJSON(route, options){
     try{
         responseJson = await response.json();
     }catch(error){
+        let responseText
         try{
-            let responseText = await response.text();
+            responseText = await response.text();
         }catch(getTextError){
             displayError()
             throw new Error(

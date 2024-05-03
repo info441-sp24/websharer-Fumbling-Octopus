@@ -32,29 +32,11 @@ router.post('/', async (req, res) => {
         }
     } else {
         console.log("Error:", error)
-        res.status(500).json({"status": "error", "error": "not logged in"})
+        res.status(401).json({"status": "error", "error": "not logged in"})
     }
     
 })
 
-// router.get('/', async function(req, res) {
-//     try{
-//       let allPosts = await req.models.Post.find()
-//       const postData = await Promise.all (allPosts.map(async post => {
-//         try{
-//           htmlPreview = await getURLPreview(post.url)
-//         } catch{
-//           htmlPreview = error.message
-//           res.send('error')
-//         }
-//         return { description: post.description, htmlPreview: `Error: ${error.message}` };
-//       }));
-//       res.json(postData)
-//     } catch(error) {
-//       console.log("Error:", error)
-//       res.status(500).json({"status": "error", "error": error})
-//     }
-//   });
 
 router.get('/', async (req, res) => {
     let username = req.query.username
@@ -68,11 +50,12 @@ router.get('/', async (req, res) => {
       const postData = await Promise.all(posts.map(async post => {
         let htmlPreview = {}
           try {
-              const htmlPreview = await getURLPreview(post.url);
-              return { description: post.description, htmlPreview };
+            htmlPreview = await getURLPreview(post.url);
           } catch (error) {
-              return { description: post.description, htmlPreview: htmlPreview, "username": post.username};
-          }
+            htmlPreview = err.message
+        }
+          return { "description": post.description, "username" : post.username, "htmlPreview" : htmlPreview };
+
       }));
       res.json(postData);
   } catch (error) {

@@ -19,14 +19,14 @@ import { dirname } from 'path';
 // NOTE: Mac zsh shell seems to block this command as being sketchy (they are not wrong)
 //           instead try bash shell or another shell to do this npm install
 
-import WebAppAuthProvider from 'msal-node-wrapper'
+import WebAppAuthProvider from 'msal-node-wrapper' 
 
 const authConfig = {
 	auth: {
 		clientId: "7ea064a6-561a-4b1d-8de0-ddf159a68b88",
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
         clientSecret: "hSB8Q~ZgkV5kvCLzihotlXqproETmsqoYzjgmbPX')",
-        redirectUri: "https://a4-website-sharer-deploy.me/redirect"
+        redirectUri: "https://a4-website-sharer-deploy.me/redirect",
 	},
 
 	system: {
@@ -50,7 +50,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use((req, res, next) => {
+app.use((req, next) => {
     req.models = postModel;
     next();
 });
@@ -98,7 +98,7 @@ app.get('/fakelogin', (req, res) => {
     session.account.name = newName;
     session.account.username = newName;
     console.log("set session");
-    res.redirect("/api/v3/myIdentity");
+    res.redirect("/api/v3/users/myIdentity");
 });
 
 // use this by going to a url like: 
@@ -111,7 +111,5 @@ app.get('/fakelogout', (req, res) => {
     console.log("you have fake logged out");
     res.redirect("/api/v3/users/myIdentity");
 });
-
-
 
 export default app;
