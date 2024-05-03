@@ -27,8 +27,6 @@ async function loadIdentity() {
         identity_div.innerHTML = `<div>
         <button onclick="loadIdentity()">retry</button>
         Error loading identity: <span id="identity_error_span"></span>
-        <a href="signout" class="btn btn-danger" role="button">Log out</a>
-        <a href="signin" class="btn btn-primary" role="button">Log in</a>
         </div>`;
         document.getElementById("identity_error_span").innerText = error;
         if (document.getElementById("make_post_div")) {

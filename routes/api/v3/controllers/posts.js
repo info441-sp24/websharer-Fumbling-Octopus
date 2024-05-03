@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
         }
     } else {
         console.log("Error:", error)
-        res.status(401).json({"status": "error", "error": "not logged in"})
+        res.status(500).json({"status": "error", "error": "not logged in"})
     }
     
 })
@@ -66,18 +66,19 @@ router.get('/', async (req, res) => {
         posts = await req.models.Post.find();
     }
       const postData = await Promise.all(posts.map(async post => {
+        let htmlPreview = {}
           try {
               const htmlPreview = await getURLPreview(post.url);
               return { description: post.description, htmlPreview };
           } catch (error) {
-              return { description: post.description, htmlPreview: `Error: ${error.message}` };
+              return { description: post.description, htmlPreview: htmlPreview, "username": post.username};
           }
       }));
       res.json(postData);
   } catch (error) {
       console.error(error);
       console.log('here is the problem 2')
-      res.status(500).json({ status: "error", error: error.message }); // Send a 500 status on error
+      res.status(500).json({ status: "error", error: error.message });
   }
 });
 

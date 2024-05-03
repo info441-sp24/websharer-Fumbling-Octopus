@@ -3,9 +3,12 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import postModel from './models.js';
+import sessions from "express-session"
 
-import apiV1router from './routes/api/v1/apiv1.js';
-import apiV2router from './routes/api/v2/apiv2.js';
+import apiV1Router from './routes/api/v1/apiv1.js';
+import apiV2Router from './routes/api/v2/apiv2.js';
+import apiV3Router from './routes/api/v3/apiv3.js';
+
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -20,15 +23,15 @@ import WebAppAuthProvider from 'msal-node-wrapper'
 
 const authConfig = {
 	auth: {
-		clientId: "b9729840-2121-46ec-b898-9fb20f1521ee",
+		clientId: "7ea064a6-561a-4b1d-8de0-ddf159a68b88",
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
-        clientSecret: "Client or Application secret here (NOT THE 'secret id', but the 'secret value')",
+        clientSecret: "hSB8Q~ZgkV5kvCLzihotlXqproETmsqoYzjgmbPX')",
         redirectUri: "https://a4-website-sharer-deploy.me/redirect"
 	},
 
 	system: {
     	loggerOptions: {
-        	loggerCallback(loglevel, message, containsPii) {
+        	loggerCallback(message) {
             	console.log(message);
         	},
         	piiLoggingEnabled: false,
@@ -52,7 +55,63 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/api/v2', apiV2router);
-app.use('/api/v1', apiV1router);
+
+const oneDay = 1000 * 60 * 60 * 24
+app.use(sessions({
+    secret: "06a646f5-a359-4de1-a530-51e7eb836fda",
+    saveUninitialized: true,
+    cookie: {maxAge: oneDay},
+    resave: false
+}))
+
+const authProvider = await WebAppAuthProvider.WebAppAuthProvider.initialize(authConfig);
+app.use(authProvider.authenticate())
+
+app.get('/signin', (req, res, next) => {
+    return req.authContext.login({
+        postLoginRedirectUri: "/",
+    })
+    (req, res, next);
+});
+
+app.get( '/signout', (req, res, next) => {
+    return req.authContext.logout({
+        postLogoutRedirectUri: "/",
+    })
+    (req, res, next);
+});
+
+app.use(authProvider.interactionErrorHandler());
+app.use('/api/v3', apiV3Router);
+app.use('/api/v2', apiV2Router);
+app.use('/api/v1', apiV1Router);
+
+// use this by going to urls like: 
+// http://localhost:3000/fakelogin?name=anotheruser
+app.get('/fakelogin', (req, res) => {
+    let newName = req.query.name;
+    let session=req.session;
+    session.isAuthenticated = true;
+    if(!session.account){
+        session.account = {};
+    }
+    session.account.name = newName;
+    session.account.username = newName;
+    console.log("set session");
+    res.redirect("/api/v3/myIdentity");
+});
+
+// use this by going to a url like: 
+// http://localhost:3000/fakelogout
+app.get('/fakelogout', (req, res) => {
+    let newName = req.query.name;
+    let session=req.session;
+    session.isAuthenticated = false;
+    session.account = {};
+    console.log("you have fake logged out");
+    res.redirect("/api/v3/users/myIdentity");
+});
+
+
 
 export default app;

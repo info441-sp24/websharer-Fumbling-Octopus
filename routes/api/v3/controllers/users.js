@@ -1,7 +1,7 @@
 import express from 'express';
 var router = express.Router();
 
-router.get("api/v3/users/myIdentity", async (req, res) => {
+router.get("/myIdentity", async (req, res) => {
     try {
         if (req.session.isAuthenticated) {
             res.json({
@@ -22,3 +22,5 @@ router.get("api/v3/users/myIdentity", async (req, res) => {
         res.status(500).send("Cannot login")
     }
 })
+
+export default router;
