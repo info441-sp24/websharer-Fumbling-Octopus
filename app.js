@@ -58,7 +58,7 @@ app.use((req, res, next) => {
 
 const oneDay = 1000 * 60 * 60 * 24
 app.use(sessions({
-    secret: "",
+    secret: "06a646f5-a359-4de1-a530-51e7eb836fda",
     saveUninitialized: true,
     cookie: {maxAge: oneDay},
     resave: false
