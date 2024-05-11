@@ -88,6 +88,7 @@ app.use('/api', apiV1Router);
 
 // use this by going to urls like: 
 // http://localhost:3000/fakelogin?name=anotheruser
+
 app.get('/fakelogin', (req, res) => {
     let newName = req.query.name;
     let session=req.session;
@@ -98,7 +99,7 @@ app.get('/fakelogin', (req, res) => {
     session.account.name = newName;
     session.account.username = newName;
     console.log("set session");
-    res.redirect("/api/v3/myIdentity");
+    res.redirect("/api/v3/getIdentity");
 });
 
 // use this by going to a url like: 
@@ -109,8 +110,7 @@ app.get('/fakelogout', (req, res) => {
     session.isAuthenticated = false;
     session.account = {};
     console.log("you have fake logged out");
-    res.redirect("/api/v3/myIdentity");
+    res.redirect("/api/v3/getIdentity");
 });
-
 export default app;
 

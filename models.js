@@ -12,10 +12,18 @@ const postSchema = new mongoose.Schema({
     url: String,
     description: String,
     username: { type: String, required: true },
+    likes: [String],
     created_date: Date
 })
-
+const commentSchema = new mongoose.Schema({
+    username: { type: String, required: true },
+    comment: { type: String, required: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+    created_date: { type: Date, default: Date.now }
+});
 models.Post = mongoose.model('Post', postSchema)
+models.Comment = mongoose.model('Comment', commentSchema);
+
 
 console.log("mongoose models created")
 

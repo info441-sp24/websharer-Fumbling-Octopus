@@ -1,71 +1,105 @@
 import express from 'express';
+import models from '../../../../models.js';
 
-var router = express.Router();
+const router = express.Router();
 
-import getURLPreview from '../utils/urlPreviews.js';
-
-// const escapeHTML = str => String(str).replace(/[&<>'"]/g, 
-//     tag => ({
-//         '&': '&amp;',
-//         '<': '&lt;',
-//         '>': '&gt;',
-//         "'": '&#39;',
-//         '"': '&quot;'
-//     }[tag]));
-
-//TODO: Add handlers here
-router.post('/', async (req, res, next) => {
-    if (req.session.isAuthenticated) {
-        let reqBody = req.body
-        try{
-            let comingPost = new req.models.Post({
-                url: reqBody.url,
-                username: req.session.account.username,
-                description: reqBody.description,
-                created_date: Date.now()
-            })
-            
-            // await escapeHTML(comingPost).save()
-            await comingPost.save()
-
-            res.json({"status": "success"});
-        } catch (error){
-            console.log("Error:", error)
-            res.status(500).json({"status": "error", "error": error})
-        }
-    } else {
-        console.log("Error:", error)
-        res.status(401).json({"status": "error", "error": "not logged in"})
+// GET /api/v3/posts - Retrieve all posts
+router.get('/api/v3/posts', async (req, res) => {
+    try {
+        const posts = await models.Post.find({}).lean();
+        // Rename _id to id
+        posts.forEach(post => post.id = post._id);
+        res.json(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 'error', error });
     }
-    
-})
+});
 
-
-router.get('/', async (req, res, next) => {
-    let username = req.query.username
-  try {
-    let posts = []
-    if (username) {
-        posts = await req.models.Post.find({username: username});
-    } else {
-        posts = await req.models.Post.find();
-    }
-    const postData = await Promise.all (posts.map(async post => {
-    let htmlPreview = {}
-        try {
-            htmlPreview = await getURLPreview(post.url);
-        } catch (error) {
-            htmlPreview = error.message
+// POST /api/v3/posts/like - Like a post
+router.post('/api/v3/posts/like', async (req, res) => {
+    try {
+        if (!req.session || !req.session.account) {
+            return res.status(401).json({ status: 'error', error: 'not logged in' });
         }
-        return { "description": post.description, "username" : post.username, "htmlPreview" : htmlPreview };
 
-    }));
-    res.json(postData);
-  } catch (error) {
-      console.error(error);
-      console.log('here is the problem 2')
-      res.status(500).json({ status: "error", error: error.message });
-  }
+        const { postID } = req.body;
+        const username = req.session.account.username;
+        const post = await models.Post.findById(postID);
+
+        if (!post) {
+            return res.status(404).json({ status: 'error', error: 'post not found' });
+        }
+
+        if (!post.likes.includes(username)) {
+            post.likes.push(username);
+            await post.save();
+        }
+
+        res.json({ status: 'success' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 'error', error });
+    }
+});
+
+// POST /api/v3/posts/unlike - Unlike a post
+router.post('/api/v3/posts/unlike', async (req, res) => {
+    try {
+        if (!req.session || !req.session.account) {
+            return res.status(401).json({ status: 'error', error: 'not logged in' });
+        }
+
+        const { postID } = req.body;
+        const username = req.session.account.username;
+        const post = await models.Post.findById(postID);
+
+        if (!post) {
+            return res.status(404).json({ status: 'error', error: 'post not found' });
+        }
+
+        const index = post.likes.indexOf(username);
+        if (index > -1) {
+            post.likes.splice(index, 1);
+            await post.save();
+        }
+
+        res.json({ status: 'success' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 'error', error });
+    }
+});
+
+// DELETE /api/v3/posts - Delete a post
+router.delete('/api/v3/posts', async (req, res) => {
+    try {
+        if (!req.session || !req.session.account) {
+            return res.status(401).json({ status: 'error', error: 'not logged in' });
+        }
+
+        const { postID } = req.body;
+        const username = req.session.account.username;
+        const post = await models.Post.findById(postID);
+
+        if (!post) {
+            return res.status(404).json({ status: 'error', error: 'post not found' });
+        }
+
+        if (post.username !== username) {
+            return res.status(401).json({ status: 'error', error: 'you can only delete your own posts' });
+        }
+
+        // Delete all comments referencing this post
+        await models.Comment.deleteMany({ post: postID });
+        // Delete the post itself
+        await models.Post.deleteOne({ _id: postID });
+
+        res.json({ status: 'success' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 'error', error });
+    }
 });
 
 export default router;
