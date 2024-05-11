@@ -4,7 +4,7 @@ import models from '../../../../models.js';
 const router = express.Router();
 
 // GET /api/v3/posts - Retrieve all posts
-router.get('/api/v3/posts', async (req, res) => {
+router.get('', async (req, res) => {
     try {
         const posts = await models.Post.find({}).lean();
         // Rename _id to id
@@ -17,7 +17,7 @@ router.get('/api/v3/posts', async (req, res) => {
 });
 
 // POST /api/v3/posts/like - Like a post
-router.post('/api/v3/posts/like', async (req, res) => {
+router.post('/like', async (req, res) => {
     try {
         if (!req.session || !req.session.account) {
             return res.status(401).json({ status: 'error', error: 'not logged in' });
@@ -44,7 +44,7 @@ router.post('/api/v3/posts/like', async (req, res) => {
 });
 
 // POST /api/v3/posts/unlike - Unlike a post
-router.post('/api/v3/posts/unlike', async (req, res) => {
+router.post('/unlike', async (req, res) => {
     try {
         if (!req.session || !req.session.account) {
             return res.status(401).json({ status: 'error', error: 'not logged in' });
@@ -72,7 +72,7 @@ router.post('/api/v3/posts/unlike', async (req, res) => {
 });
 
 // DELETE /api/v3/posts - Delete a post
-router.delete('/api/v3/posts', async (req, res) => {
+router.delete('/', async (req, res) => {
     try {
         if (!req.session || !req.session.account) {
             return res.status(401).json({ status: 'error', error: 'not logged in' });
