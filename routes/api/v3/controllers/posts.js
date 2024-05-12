@@ -4,7 +4,7 @@ import models from '../../../../models.js';
 const router = express.Router();
 
 // GET /api/v3/posts - Retrieve all posts
-router.get('', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const posts = await models.Post.find({}).lean();
         // Rename _id to id

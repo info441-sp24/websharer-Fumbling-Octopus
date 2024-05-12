@@ -3,7 +3,7 @@ import models from '../../../../models.js';
 const router = express.Router();
 
 // GET /api/v3/comments - Get comments for a specific post
-router.get('/api/v3/comments', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const { postID } = req.query;
         const comments = await models.Comment.find({ post: postID }).lean();
@@ -15,7 +15,7 @@ router.get('/api/v3/comments', async (req, res) => {
 });
 
 // POST /api/v3/comments - Add a comment to a specific post
-router.post('/api/v3/comments', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         if (!req.session || !req.session.account) {
             return res.status(401).json({ status: 'error', error: 'not logged in' });
