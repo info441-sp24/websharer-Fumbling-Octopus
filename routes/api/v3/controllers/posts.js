@@ -3,6 +3,31 @@ import models from '../../../../models.js';
 
 const router = express.Router();
 
+router.post("/", async (req, res, next) => {
+    if (req.session.isAuthenticated) {
+        let postObj = req.body;
+        try {
+            let newPost = new req.models.Post({
+                url: postObj.url,
+                username: req.session.account.username,
+                description: postObj.description,
+                created_date: Date.now()
+            });
+            await newPost.save();
+            res.json({ "status": "success" });
+        } catch (error) {
+            console.log(error.message)
+            res.status(500).json({ "status": "error", "error": error.message });
+        }
+    } else {
+        res.status(401)
+        res.json({
+            status: "error",
+            error: "not logged in"
+         })
+    }
+});
+
 // GET /api/v3/posts - Retrieve all posts
 router.get('/', async (req, res) => {
     try {

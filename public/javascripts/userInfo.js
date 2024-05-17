@@ -15,18 +15,16 @@ async function saveUserInfo(){
             method: "POST",
             body: {
                 username: username,
-                useremail: email,
-                userfavoritedonut: favoriteDonut
+                favoriteFood: newInfo
             }
         })
     } catch (error) {
         document.getElementById("user-status").innerText = "error"
         throw(error)
     }
-    document.getElementById('user-email-input').value = "";
-    document.getElementById('user-favorite-donut-input').value = "";
-    document.getElementById("user-status").innerText = "Data saved!";
-    document.getElementById("user_favorite_donut").innerHTML = "";
+    document.getElementById('user-info-input').value = ""
+    document.getElementById('user-status').innerText = ""
+    document.getElementById("user_favorite_food").innerHTML = ""
 
     loadUserInfo()
 }
@@ -44,25 +42,17 @@ async function loadUserInfo(){
     }
     
     //TODO: do an ajax call to load whatever info you want about the user from the user table
-    let infoJSON = await fetchJSON(`api/${apiVersion}/userInfo?username=${username}`);
-    let infoDiv = document.getElementById("user_info_div");
+    let infoJSON = await fetchJSON(`api/${apiVersion}/userInfo?username=${username}`)
+    infoDiv = document.getElementById("user_info_div")
 
-    let emailDiv = document.createElement("div");
-    emailDiv.id = "user_email";
-    emailDiv.innerHTML = `
-        <p>Email: ${escapeHTML(infoJSON.email)}</p>
-    `;
+    let foodDiv = document.createElement("div")
+    foodDiv.id = "user_favorite_food"
+    foodDiv.innerHTML = `
+        <p>${escapeHTML(infoJSON.favoriteFood)}</p>
+        <p>Last Updated: ${escapeHTML(infoJSON.created_date)}</p>`
 
-    let donutDiv = document.createElement("div");
-    donutDiv.id = "user_favorite_donut";
-    donutDiv.innerHTML = `
-        <p>Favorite Donut: ${escapeHTML(infoJSON.favoriteDonut)}</p>
-    `;
-
-    infoDiv.appendChild(emailDiv);
-    infoDiv.appendChild(donutDiv);
-
-    loadUserInfoPosts(username);
+    infoDiv.appendChild(foodDiv)
+    loadUserInfoPosts(username)
 }
 
 

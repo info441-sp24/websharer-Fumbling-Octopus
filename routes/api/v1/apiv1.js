@@ -19,7 +19,6 @@ router.get('/urls/preview', async (req, res, next)=>{
 
     const pageText = await fetchQuery.text()
 
-
     //parse html
     const htmlPageContent = parser.parse(pageText)
 
@@ -28,16 +27,11 @@ router.get('/urls/preview', async (req, res, next)=>{
     const findTitle = htmlPageContent.querySelector("meta[property='og:title']")
     const findDescription = htmlPageContent.querySelector("meta[property='og:description']")
 
-    // let url = findUrl ? findUrl.getAttribute('content') : queryString;
-    // let title = findTitle ? findTitle.getAttribute('content') : (htmlPageContent.querySelector('title') ? htmlPageContent.querySelector('title').innerHTML : queryString);
-    // let image = findImage ? findImage.getAttribute('content') : '';
-    // let description = findDescription ? findDescription.getAttribute('content') : '';
+    
     let url = findUrl ? findUrl.getAttribute('content') : queryString;
     let title = findTitle ? findTitle.getAttribute('content') : (htmlPageContent.querySelector('title') ? htmlPageContent.querySelector('title').innerHTML : queryString);
     let image = findImage ? `<img src="${findImage.getAttribute('content')}" style="max-height: 200px; max-width: 270px;">` : '';
     let description = findDescription ? `<p>${findDescription.getAttribute('content')}</p>` : '';
-
-
 
     const htmlDisplay = 
       `<div style="max-width: 300px; border: solid 1px; padding: 3px; text-align: center;">

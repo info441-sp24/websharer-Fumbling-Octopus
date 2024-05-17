@@ -6,11 +6,11 @@ router.post("/", async (req, res) => {
         let username = req.session.account.username;
         console.log("username(test): " + username);
         let email = req.body.useremail;
-        let favoriteDonut = req.body.favoritedonuts;
+        let favoriteDonut = req.body.favoriteDonut;
         let created_date = req.body.created_date;
         try {
             let filter = { username: username };
-            let update = { useremail: email, userfavoritedonut: favoriteDonut, created_date: created_date };
+            let update = { email: email, favoriteDonut: favoriteDonut, created_date: created_date };
             let options = { upsert: true, new: true };
             await req.models.User.findOneAndUpdate(filter, update, options);
             res.status(200).json({"status": "success"});
@@ -18,7 +18,6 @@ router.post("/", async (req, res) => {
             res.status(500).json({"status": "error", "error": error.message});
         }
     } else {
-        console.log("error 1")
         return res.status(401).json({status: "error", error: "not logged in"});
     }
 });
@@ -29,7 +28,6 @@ router.get("/", async (req, res) => {
         try {
             let userInfo = await req.models.User.findOne({ username });
             if (!userInfo) {
-                
                 return res.status(401).json({userInfo: "not found", created_date: "not found"});
             }
             res.json(userInfo);

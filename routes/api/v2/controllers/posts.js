@@ -29,25 +29,6 @@ router.post('/', async (req, res) => {
     }
 })
 
-// router.get('/', async function(req, res) {
-//     try{
-//       let allPosts = await req.models.Post.find()
-//       const postData = await Promise.all (allPosts.map(async post => {
-//         try{
-//           htmlPreview = await getURLPreview(post.url)
-//         } catch{
-//           htmlPreview = error.message
-//           res.send('error')
-//         }
-//         return { description: post.description, htmlPreview: `Error: ${error.message}` };
-//       }));
-//       res.json(postData)
-//     } catch(error) {
-//       console.log("Error:", error)
-//       res.status(500).json({"status": "error", "error": error})
-//     }
-//   });
-
 router.get('/', async (req, res) => {
   try {
       const posts = await req.models.Post.find(); 

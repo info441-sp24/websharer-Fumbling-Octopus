@@ -31,10 +31,10 @@ async function main() {
 
     const userSchema = new mongoose.Schema({
         username: String,
-        email: String,
-        favoriteDonut: String,
+        favoriteFood: String,
         created_date: { type: Date, default: Date.now }
-    });
+    })
+    
     models.User = mongoose.model('User', userSchema);
     console.log("User Model created");
 }
