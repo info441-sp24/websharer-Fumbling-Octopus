@@ -6,6 +6,29 @@ async function init(){
 async function saveUserInfo(){
     //TODO: do an ajax call to save whatever info you want about the user from the user table
     //see postComment() in the index.js file as an example of how to do this
+    document.getElementById("user-status").innerText = "sending data...";
+    newInfo = document.getElementById('user-info-input').value;
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('user');
+    try {
+        await fetchJSON(`api/${apiVersion}/userInfo`, {
+            method: "POST",
+            body: {
+                username: username,
+                useremail: email,
+                userfavoritedonut: favoriteDonut
+            }
+        })
+    } catch (error) {
+        document.getElementById("user-status").innerText = "error"
+        throw(error)
+    }
+    document.getElementById('user-email-input').value = "";
+    document.getElementById('user-favorite-donut-input').value = "";
+    document.getElementById("user-status").innerText = "Data saved!";
+    document.getElementById("user_favorite_donut").innerHTML = "";
+
+    loadUserInfo()
 }
 
 async function loadUserInfo(){
@@ -21,8 +44,25 @@ async function loadUserInfo(){
     }
     
     //TODO: do an ajax call to load whatever info you want about the user from the user table
+    let infoJSON = await fetchJSON(`api/${apiVersion}/userInfo?username=${username}`);
+    let infoDiv = document.getElementById("user_info_div");
 
-    loadUserInfoPosts(username)
+    let emailDiv = document.createElement("div");
+    emailDiv.id = "user_email";
+    emailDiv.innerHTML = `
+        <p>Email: ${escapeHTML(infoJSON.email)}</p>
+    `;
+
+    let donutDiv = document.createElement("div");
+    donutDiv.id = "user_favorite_donut";
+    donutDiv.innerHTML = `
+        <p>Favorite Donut: ${escapeHTML(infoJSON.favoriteDonut)}</p>
+    `;
+
+    infoDiv.appendChild(emailDiv);
+    infoDiv.appendChild(donutDiv);
+
+    loadUserInfoPosts(username);
 }
 
 

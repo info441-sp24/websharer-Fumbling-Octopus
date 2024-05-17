@@ -1,30 +1,42 @@
-import mongoose from 'mongoose'
-
-let models = {}
-
-console.log("connecting to mongodb")
-//TODO: Add your mongoDB connection string (mongodb+srv://...)
-await mongoose.connect("mongodb+srv://jh345:jh345@cluster0.wxwxdi1.mongodb.net/")
-
-console.log("successfully connected to mongodb")
-
-const postSchema = new mongoose.Schema({
-    url: String,
-    description: String,
-    username: { type: String, required: true },
-    likes: [String],
-    created_date: Date
-})
-const commentSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    comment: { type: String, required: true },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
-    created_date: { type: Date, default: Date.now }
-});
-models.Post = mongoose.model('Post', postSchema)
-models.Comment = mongoose.model('Comment', commentSchema);
 
 
-console.log("mongoose models created")
+import mongoose from 'mongoose';
 
-export default models
+let models = {};
+main();
+
+async function main() {
+    console.log("Connect to mongoDB");
+    await mongoose.connect("mongodb+srv://jh345:jh345@cluster0.wxwxdi1.mongodb.net/");
+
+
+    const postSchema = new mongoose.Schema({
+        url: String,
+        username: String,
+        description: String,
+        likes: [String],
+        created_date: Date
+    });
+    models.Post = mongoose.model('Post', postSchema);
+    console.log("Post Model created");
+
+    const commentSchema = new mongoose.Schema({
+        username: String,
+        comment: String,
+        post: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
+        created_date: Date
+    });
+    models.Comment = mongoose.model('Comment', commentSchema);
+    console.log("Comment Model created");
+
+    const userSchema = new mongoose.Schema({
+        username: String,
+        email: String,
+        favoriteDonut: String,
+        created_date: { type: Date, default: Date.now }
+    });
+    models.User = mongoose.model('User', userSchema);
+    console.log("User Model created");
+}
+
+export default models;
