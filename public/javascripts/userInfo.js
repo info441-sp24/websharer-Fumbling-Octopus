@@ -59,7 +59,7 @@ async function loadUserInfo(){
     let emailDiv = document.createElement("div");
     emailDiv.id = "user_email";
     emailDiv.innerHTML = `
-        <p>Email: ${escapeHTML(infoJSON.email)}</p>
+        <p>Contact Email: ${escapeHTML(infoJSON.email)}</p>
     `;
     // console.log(''infoJSON.email)
 
