@@ -27,7 +27,7 @@ const authConfig = {
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
         clientSecret: "hSB8Q~ZgkV5kvCLzihotlXqproETmsqoYzjgmbPX",
         // redirectUri: "/redirect"
-        redirectUri: "https://a4-website-sharer-deploy.me/redirect" 
+        redirectUri: "/redirect" 
 	},
 
 	system: {
